@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${tarea.id == null ? 'Nueva Tarea' : 'Editar Tarea'}">Formulario de Tarea</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #065A82; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="date"], select, textarea { width: 100%; max-width: 400px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .error { color: #C62828; font-size: 14px; margin-top: 5px; display: block; }
+        .btn { padding: 10px 15px; color: white; text-decoration: none; border-radius: 3px; border: none; cursor: pointer; font-size: 14px; }
+        .btn-guardar { background-color: #21295C; }
+        .btn-cancelar { background-color: #888; margin-left: 10px; }
+    </style>
+</head>
+<body>
+
+<h1 th:text="${tarea.id == null ? 'Nueva Tarea' : 'Editar Tarea'}">Formulario</h1>
+
+<form th:action="@{/tareas/guardar}" th:object="${tarea}" method="post">
+    <!-- Campo oculto para el ID -->
+    <input type="hidden" th:field="*{id}" />
+    <!-- Campo oculto para completada, así no se pierde el estado al editar -->
+    <input type="hidden" th:field="*{completada}" />
+
+    <div class="form-group">
+        <label for="titulo">Título</label>
+        <input type="text" id="titulo" th:field="*{titulo}" placeholder="Ingrese el título" />
+        <span class="error" th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}">Error de título</span>
+    </div>
+
+    <div class="form-group">
+        <label for="descripcion">Descripción</label>
+        <textarea id="descripcion" th:field="*{descripcion}" rows="4" placeholder="Ingrese la descripción"></textarea>
+        <span class="error" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}">Error de descripción</span>
+    </div>
+
+    <div class="form-group">
+        <label for="prioridad">Prioridad</label>
+        <select id="prioridad" th:field="*{prioridad}">
+            <option value="">Seleccione...</option>
+            <option th:each="p : ${T(com.universidad.tareas.model.Prioridad).values()}"
+                    th:value="${p}"
+                    th:text="${p}">Prioridad</option>
+        </select>
+        <span class="error" th:if="${#fields.hasErrors('prioridad')}" th:errors="*{prioridad}">Error de prioridad</span>
+    </div>
+
+    <div class="form-group">
+        <label for="fechaLimite">Fecha Límite</label>
+        <input type="date" id="fechaLimite" th:field="*{fechaLimite}" />
+        <span class="error" th:if="${#fields.hasErrors('fechaLimite')}" th:errors="*{fechaLimite}">Error de fecha límite</span>
+    </div>
+
+    <button type="submit" class="btn btn-guardar">Guardar</button>
+    <a href="/tareas" class="btn btn-cancelar">Cancelar</a>
+</form>
+
+</body>
+</html>

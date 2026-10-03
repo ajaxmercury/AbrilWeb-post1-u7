@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Tareas</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #065A82; }
+        .btn { padding: 5px 10px; color: white; text-decoration: none; border-radius: 3px; border: none; cursor: pointer; font-size: 14px; margin-right: 5px; }
+        .btn-nuevo { background-color: #21295C; }
+        .btn-editar { background-color: #1C7293; }
+        .btn-completar { background-color: #2E7D32; }
+        .btn-eliminar { background-color: #C62828; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        th { background-color: #065A82; color: white; }
+        .completada { text-decoration: line-through; color: #888; }
+        .filtros { margin-bottom: 15px; padding: 10px; background-color: #f5f5f5; border: 1px solid #ddd; }
+        form { display: inline; }
+    </style>
+</head>
+<body>
+
+<h1>Gestión de Tareas</h1>
+
+<div class="filtros">
+    <form action="/tareas" method="get">
+        <label for="prioridad">Prioridad:</label>
+        <select name="prioridad" id="prioridad" onchange="this.form.submit()">
+            <option value="">Todas</option>
+            <option value="ALTA" th:selected="${prioridad != null and prioridad.name() == 'ALTA'}">Alta</option>
+            <option value="MEDIA" th:selected="${prioridad != null and prioridad.name() == 'MEDIA'}">Media</option>
+            <option value="BAJA" th:selected="${prioridad != null and prioridad.name() == 'BAJA'}">Baja</option>
+        </select>
+
+        <label for="completada" style="margin-left: 20px;">Estado:</label>
+        <select name="completada" id="completada" onchange="this.form.submit()">
+            <option value="">Todos</option>
+            <option value="false" th:selected="${completada != null and completada == false}">Pendientes</option>
+            <option value="true" th:selected="${completada != null and completada == true}">Completadas</option>
+        </select>
+    </form>
+</div>
+
+<a href="/tareas/nueva" class="btn btn-nuevo">Nueva Tarea</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Prioridad</th>
+            <th>Fecha Límite</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:if="${#lists.isEmpty(tareas)}">
+            <td colspan="6" style="text-align: center;">No hay tareas que coincidan con el filtro.</td>
+        </tr>
+        <tr th:each="tarea : ${tareas}" th:classappend="${tarea.completada} ? 'completada' : ''">
+            <td th:text="${tarea.id}"></td>
+            <td th:text="${tarea.titulo}"></td>
+            <td th:text="${tarea.prioridad}"></td>
+            <td th:text="${tarea.fechaLimite}"></td>
+            <td th:text="${tarea.completada} ? 'Completada' : 'Pendiente'"></td>
+            <td>
+                <a th:href="@{/tareas/{id}/editar(id=${tarea.id})}" class="btn btn-editar">Editar</a>
+                
+                <form th:if="${!tarea.completada}" th:action="@{/tareas/{id}/completar(id=${tarea.id})}" method="post">
+                    <button type="submit" class="btn btn-completar">Completar</button>
+                </form>
+
+                <form th:action="@{/tareas/{id}/eliminar(id=${tarea.id})}" method="post" onsubmit="return confirm('¿Está seguro de que desea eliminar esta tarea?');">
+                    <button type="submit" class="btn btn-eliminar">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
